@@ -1,0 +1,624 @@
+/* ==========================================================================
+   DocsLean — Layout & Components
+   Uses tokens from styles/tokens.css. Desktop-first per CLAUDE.md.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+/* Sticky .navbar sits on top of the document, but a same-page anchor jump
+   (logo → #top, or any navbar link) scrolls so the target's OWN top edge
+   hits the viewport top — with no allowance for the sticky navbar still
+   pinned above it, so the top slice of whatever you jumped to (here, the
+   hero) ends up hidden behind/above the fold. scroll-margin-top reserves
+   that space for every anchor target, sized to the navbar's real height
+   (--space-7, 64px — a safe rounding of its actual ~56px). */
+#top, #how-it-works, #what-changes, #product, #faq {
+  scroll-margin-top: var(--space-7);
+}
+body {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--color-text-primary);
+  background: var(--color-surface-0);
+}
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* Present in the DOM/text content (so link previews read "DocsLean" in
+   full, not just the visible "ocsLean" span) but invisible on screen. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Structural fix for line-length/orphans instead of manual eyeballing:
+   balance wraps short heading text evenly; pretty avoids a lone last word. */
+h1, h2, h3 { text-wrap: balance; }
+p, li, .section__subtitle { text-wrap: pretty; }
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-heading);
+  letter-spacing: var(--letter-spacing-h2);
+}
+h3 {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-heading);
+  letter-spacing: var(--letter-spacing-h3);
+}
+/* Line length target: 45-60 characters max, not just "not too wide" —
+   480px at 18px keeps this well inside that range. */
+.section__subtitle {
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+  max-width: 460px; /* 400px pushed this under the 45-char floor (~43/line) */
+}
+
+/* Proximity rule (applies site-wide, not just hero): a heading and its
+   direct subheading are one visual group and sit closer together than
+   the gap to the next distinct element (button, grid, next group). */
+.section h2,
+.section .section__subtitle {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Section h2s are now full sentences (7-13 words) — cap width so they
+   wrap to a clean 2 lines (with text-wrap: balance above) instead of
+   one very long line or a ragged 3rd line. */
+.section h2 { max-width: 600px; }
+
+.button {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-base);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body);
+  transition: var(--transition-base);
+  border: none;
+  cursor: pointer;
+}
+.button--accent {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+.button--accent:hover,
+.button--accent:focus-visible { background: var(--color-accent-hover); }
+/* :focus-visible only (not plain :focus) — shows the ring for keyboard
+   navigation, not on mouse click. --color-on-accent (dark), not white —
+   this button's own background is the light accent yellow. */
+.button--accent:focus-visible { outline: 2px solid var(--color-on-accent); outline-offset: 2px; }
+
+/* ------------------------------------------------------------------------
+   NAVBAR
+   ------------------------------------------------------------------------ */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-primary); /* same as hero — only .scrolled changes it */
+  transition: var(--transition-base);
+}
+.navbar.scrolled {
+  background: var(--color-surface-0);
+  box-shadow: var(--shadow-card);
+}
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-2);
+}
+.logo {
+  display: inline-flex;
+  align-items: baseline;
+  /* Source doc flags the "D"+"ocsLean" gap as needing a manual check on
+     real Geist (the "D" is a hand-drawn SVG path, not a font glyph, so it
+     gets none of Geist's own side-bearing before "o"). Left at 0 pending
+     a visual check — any fix here still has to come off the --space scale
+     or be documented as an explicit exception, not an arbitrary px value. */
+  gap: 0;
+  color: var(--color-logo);
+  font-weight: var(--font-weight-semibold);
+  /* var(--font-size-subheading) (18px) — nearest token to the old
+     hardcoded 20px (|20-18|=2 vs |20-24|=4). */
+  font-size: var(--font-size-subheading);
+}
+/* logo tracks the text color of whatever surface it sits on — --color-logo
+   is the brand wordmark color for light backgrounds; dark backgrounds
+   (hero, footer) keep --color-text-on-dark instead. */
+.navbar .logo { color: var(--color-text-on-dark); }
+.navbar.scrolled .logo { color: var(--color-logo); }
+.logo__mark { flex-shrink: 0; }
+
+.navbar__nav {
+  display: flex;
+  gap: var(--space-4);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+}
+.navbar__nav a {
+  color: var(--color-text-on-dark);
+  transition: var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+}
+.navbar.scrolled .navbar__nav a { color: var(--color-text-primary); }
+.navbar__nav a:hover,
+.navbar__nav a:focus-visible { opacity: 0.7; }
+/* currentColor, not a fixed color — this link's own text color already
+   switches correctly between white (purple navbar) and dark (.scrolled
+   navbar), so the ring follows automatically in both states. */
+.navbar__nav a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+.navbar__burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-1);
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.navbar__burger span {
+  width: 22px;
+  height: 2px;
+  background: var(--color-text-on-dark);
+  transition: var(--transition-base);
+}
+.navbar.scrolled .navbar__burger span { background: var(--color-text-primary); }
+
+/* ------------------------------------------------------------------------
+   HERO
+   ------------------------------------------------------------------------
+   No forced min-height — height is purely content-driven, the next
+   section starts right where this one's content ends.
+   The two blocks (.hero__content and .hero__visual) are centered against
+   each other (align-items:center) — a flex-start variant (text top lined
+   up with HeroCard2's top) was tried and reverted back to this. */
+.hero {
+  background: var(--color-primary);
+  color: var(--color-text-on-dark);
+  padding: var(--space-8) 0;
+}
+.hero__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+}
+.hero__content { flex: 1 1 480px; }
+.hero__title {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-heading);
+  letter-spacing: var(--letter-spacing-h1);
+}
+.hero__subtitle {
+  margin-top: var(--space-2); /* tight — grouped with the headline */
+  font-size: var(--font-size-subheading);
+  color: var(--color-text-on-dark-secondary);
+  max-width: 460px; /* 340px pushed this under the 45-char floor (~36/line) */
+}
+.hero__content .button { margin-top: var(--space-6); } /* wider — a distinct next action */
+
+/* HeroCard1 (.hero-card--score, unscaled — its own true size) and
+   HeroCard2 (.hero-card--panel, true dashboard components) form an
+   asymmetric layered cluster: HeroCard2 is shrunk to HALF its real size
+   via transform:scale(0.5) (a genuine proportional shrink, like Figma's
+   scale tool — not a narrower column that just wraps the same content),
+   and HeroCard1 sits mostly to its LEFT/outside, with only HeroCard1's
+   own right portion overlapping HeroCard2's lower-left quadrant.
+   width/height/top/left are computed in components.js's layoutHeroCards()
+   — it measures .hero-card--panel's true unscaled size (transform doesn't
+   change offsetWidth/offsetHeight) rather than guessing constants, since a
+   guess would drift the moment the panel's content changes. Only run at
+   desktop widths — mobile/tablet use the static stacked layout below via
+   the media queries further down this file. */
+.hero__visual {
+  position: relative;
+  flex-shrink: 0;
+}
+.hero-card--panel-wrap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  overflow: hidden;
+}
+.hero-card--panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Must match HERO_CARD_SCALE in components.js exactly — that constant
+     sizes the .hero-card--panel-wrap around this same scale factor. */
+  transform: scale(0.75);
+  transform-origin: top left;
+}
+.hero-card--score {
+  position: absolute;
+  left: 0;
+  z-index: 2;
+  /* Must match SCORE_CARD_SCALE in components.js exactly — that constant
+     factors into the vertical-centering math against HeroCard2. */
+  transform: scale(0.85);
+  transform-origin: top left;
+  /* Extra "floating" presence for the marketing hero specifically, layered
+     on top of the card's own --shadow-card (set in dashboard.css). */
+  box-shadow: var(--shadow-dashboard);
+}
+
+/* ------------------------------------------------------------------------
+   SECTIONS — generic
+   ------------------------------------------------------------------------ */
+.section {
+  padding: var(--space-9) 0;
+  opacity: 1;
+}
+.section--tinted { background: var(--color-surface-1); }
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--duration-slow) var(--easing-out),
+              transform var(--duration-slow) var(--easing-out);
+}
+.fade-in.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* The hero cards already carry their own load-bearing transform (the
+   scale() that sizes HeroCard1/HeroCard2 — see the HERO section above) —
+   .fade-in's translateY would silently replace it instead of combining
+   with it (a transform property can't hold both from two separate rules).
+   Placed after .fade-in's own rules so these win the specificity tie;
+   opacity still animates normally, just without any movement, and each
+   element's own real transform stays intact throughout. */
+.hero-card--panel-wrap.fade-in,
+.hero-card--panel-wrap.fade-in.in-view {
+  transform: none;
+}
+.hero-card--score.fade-in,
+.hero-card--score.fade-in.in-view {
+  /* Must also match SCORE_CARD_SCALE in components.js. */
+  transform: scale(0.85);
+}
+/* Score card reveals slightly after the panel — same cascade technique as
+   .compare__row's staggered reveal further down this file. */
+.hero-card--score.fade-in { transition-delay: 150ms; }
+/* Tint + delayed reveal were both tried as hierarchy fixes and reverted —
+   see the HERO section's layout comment above for the approach that
+   replaced them (text positioned higher, cards start lower, pure layout —
+   no color or timing tricks). Cards are plain white again, same as the
+   real dashboard's own. */
+
+/* ------------------------------------------------------------------------
+   HOW IT WORKS
+   ------------------------------------------------------------------------ */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+}
+/* Fixed width, centered in each equal grid cell — guarantees all three
+   are truly identical (not just proportionally equal). Wide enough that
+   the longest heading ("Receive Your Top Priorities") stays on one line;
+   still narrow enough to keep body copy inside the 45-60 char target. */
+.step {
+  max-width: 400px;
+  margin: 0 auto;
+}
+/* nowrap only where the column is actually wide enough (measured at the
+   1200px container) — below that it overflowed instead of wrapping. */
+@media (min-width: 1200px) {
+  .step h3 { white-space: nowrap; }
+}
+.step p { text-wrap: balance; } /* even 2-line wrap instead of "pretty"'s orphan-only fix */
+.step__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-2);
+}
+.step h3 { margin-bottom: var(--space-1); }
+.step p { color: var(--color-text-secondary); }
+
+/* ------------------------------------------------------------------------
+   WHAT CHANGES
+   ------------------------------------------------------------------------ */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+  align-items: stretch; /* two cards, same row — equal height by default */
+  /* No extra cap — fills the container so each line has room to sit on
+     one row instead of wrapping (this is the widest 2 equal columns can
+     go without exceeding --container-max-width: 1200px). */
+}
+
+.compare__card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-base);
+  /* card's own space-4 (32px) + the last row's space-3 (24px) = 56px
+     total bottom space. */
+  padding: var(--space-6) var(--space-5) var(--space-4);
+}
+/* "Before" sits flatter/behind: muted surface, lighter shadow */
+.compare__card--before {
+  background: var(--color-surface-1);
+  box-shadow: var(--shadow-card);
+}
+/* "After" is the raised card: white, the stronger layered shadow */
+.compare__card--after {
+  background: var(--color-surface-0);
+  box-shadow: var(--shadow-dashboard);
+}
+
+.compare__title {
+  text-align: left;
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-surface-2);
+}
+.compare__card--before .compare__title { color: var(--color-text-secondary); }
+
+.compare__rows { display: flex; flex-direction: column; flex-grow: 1; }
+.compare__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-surface-2);
+}
+.compare__row:last-child { border-bottom: none; }
+/* Cascade: each row floats up slightly after the previous one, same
+   duration/easing tokens as every other fade-in on the page. */
+.compare__row:nth-child(2) { transition-delay: 80ms; }
+.compare__row:nth-child(3) { transition-delay: 160ms; }
+.compare__row:nth-child(4) { transition-delay: 240ms; }
+.compare__row i { flex-shrink: 0; font-size: 18px; }
+.compare__row strong { font-weight: var(--font-weight-semibold); }
+.compare__card--before .compare__row i { color: var(--color-score-critical); }
+.compare__card--before .compare__row span { color: var(--color-text-secondary); }
+.compare__card--after .compare__row i { color: var(--color-score-good); }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-8);
+  text-align: center;
+  /* Narrower than the full 3-column width so all three labels wrap to
+     an identical 2 lines instead of 1-2 unevenly. */
+  max-width: 1040px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.stat__value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+.stat__label {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-secondary);
+  /* balance was the bug: it re-shrinks the line box to its own optimal
+     width regardless of the container, so the fixed width below never
+     actually showed. pretty still avoids orphans without overriding it. */
+  text-wrap: pretty;
+  /* Fixed 260px overflowed the grid column on tablet/mobile, where each
+     .stat track is narrower than that. max-width caps it, % lets it shrink. */
+  width: 100%;
+  max-width: 260px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.stats__caption {
+  margin-top: var(--space-7); /* clearly separate from the stats group above */
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  text-align: center;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ------------------------------------------------------------------------
+   DEEP-DIVE
+   ------------------------------------------------------------------------
+   .dashboard's own max-width:100% caps its OUTER box, but its internal
+   nowrap table content doesn't reflow to match — it keeps its native
+   ~1440px min-content width and gets clipped by .dashboard's own
+   overflow:hidden instead of actually shrinking. components.js measures
+   this container and applies transform:scale() to .dashboard-frame__scale
+   to compensate (JS, not pure CSS, because the scale ratio depends on the
+   viewport-dependent container width, not a fixed value) — desktop only;
+   below 1025px, dashboard.css's own responsive rules restructure the
+   layout for real instead of scaling a miniature down.
+   No overflow:hidden here — this is a static "photo" of the product, not
+   the live UI, and its own box-shadow (--shadow-card + --shadow-dashboard)
+   is meant to visibly lift it off the section like a framed screenshot;
+   overflow:hidden was clipping that shadow at the frame's exact scaled
+   height. components.js sets this frame's height synchronously right after
+   scaling, so there's no visible flash of the unscaled footprint to guard
+   against. */
+.dashboard-frame {
+  margin-top: var(--space-6);
+  width: 100%;
+}
+.dashboard-frame__scale {
+  width: 1440px;
+  transform-origin: top left;
+}
+
+/* ------------------------------------------------------------------------
+   CTA + FAQ
+   ------------------------------------------------------------------------ */
+.cta-faq__head { text-align: center; max-width: 560px; margin: 0 auto; }
+.cta-faq__head .section__subtitle { margin-left: auto; margin-right: auto; }
+.cta-faq__head .button { margin-top: var(--space-4); }
+
+.accordion { margin-top: var(--space-7); max-width: 660px; margin-left: auto; margin-right: auto; }
+.accordion__item {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-base);
+  margin-bottom: var(--space-2);
+  overflow: hidden;
+}
+.accordion__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--space-3);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  text-wrap: balance; /* 660px fits the longest question (68 chars) on one line; this is a safety net */
+}
+.accordion__chevron {
+  flex-shrink: 0;
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  transition: var(--transition-base);
+}
+.accordion__item.open .accordion__chevron { transform: rotate(180deg); }
+.accordion__panel {
+  display: none;
+  padding: 0 var(--space-3) var(--space-3);
+  color: var(--color-text-secondary);
+}
+.accordion__panel p { max-width: 460px; }
+.accordion__item.open .accordion__panel { display: block; }
+
+/* ------------------------------------------------------------------------
+   FOOTER
+   ------------------------------------------------------------------------ */
+.footer {
+  background: var(--color-footer);
+  color: var(--color-text-on-dark);
+  padding: var(--space-6) 0;
+}
+.footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.footer__brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1); /* logo + tagline read as one frame */
+}
+.footer__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+}
+.footer .logo { color: var(--color-text-on-dark); }
+.footer__tagline, .footer__copyright { color: var(--color-text-on-dark-secondary); font-size: var(--font-size-body-sm); }
+.footer__email { font-size: var(--font-size-body-sm); text-decoration: underline; }
+
+/* ==========================================================================
+   RESPONSIVE — per CLAUDE.md
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .navbar__nav { display: none; }
+  .navbar__burger { display: flex; }
+  .navbar__nav.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: var(--color-surface-0);
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3);
+  }
+  .navbar__nav.open a {
+    color: var(--color-text-primary);
+    min-height: 44px; /* touch target — mobile/tablet only */
+  }
+
+  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .steps .step:last-child { grid-column: 1 / -1; }
+
+  /* Below the desktop breakpoint, components.js skips the scale transform
+     entirely and dashboard.css's own responsive rules restructure the
+     layout — the fixed 1440px width from the desktop case would otherwise
+     force horizontal clipping here instead of letting that reflow happen. */
+  .dashboard-frame__scale { width: 100%; }
+
+  /* HeroCard2 alone plus the text column doesn't fit side by side below
+     ~1024px — stacks the same way mobile does (.hero's own height is
+     already content-driven at every breakpoint now, nothing to override). */
+  .hero__inner { flex-direction: column; align-items: stretch; }
+  .hero__content { padding-top: 0; }
+  /* Undo the JS-set inline styles (width/height/transform/top/left) from
+     layoutHeroCards() — inline styles otherwise beat these media-query
+     rules regardless of viewport. components.js's own resize handler also
+     clears them below this breakpoint, but this is the fallback in case
+     that hasn't re-run yet (e.g. page loaded directly at this width). */
+  .hero__visual { width: 100% !important; height: auto !important; margin-top: var(--space-4); }
+  .hero-card--panel-wrap { position: static !important; width: 100% !important; height: auto !important; overflow: visible; }
+  .hero-card--panel { position: static !important; width: 100% !important; transform: none !important; margin-bottom: var(--space-3); }
+  .hero-card--score { position: static !important; width: 100% !important; top: auto !important; left: auto !important; transform: none !important; margin-bottom: var(--space-3); }
+}
+
+@media (max-width: 640px) {
+  /* Hero stacking is already handled by the ≤1024px block above (mobile
+     widths match that query too) — nothing hero-specific needed here. */
+  .section { padding: var(--space-6) 0; }
+
+  .steps { grid-template-columns: 1fr; }
+  .steps .step:last-child { grid-column: auto; }
+
+  .compare { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stats .stat:last-child { grid-column: 1 / -1; }
+
+  .footer__inner { flex-direction: column; text-align: center; }
+  .footer__brand, .footer__meta { align-items: center; }
+}

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocsLean — Documentation Health Score</title>
+<meta name="description" content="DocsLean identifies outdated, duplicate, and contradictory pages in your documentation and provides a health score with a 30-day action plan.">
+<link rel="icon" href="assets/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="assets/favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="styles/fonts.css">
+<link rel="stylesheet" href="styles/tokens.css">
+<!-- dashboard.css before main.css: main.css's hero rules need to override
+     dashboard.css's .hero-card--panel/--score widths inside its own mobile
+     media query — same specificity, so load order decides, and main.css
+     (the page-level file) must come after the component file it overrides. -->
+<link rel="stylesheet" href="styles/dashboard.css">
+<link rel="stylesheet" href="styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+</head>
+<body>
+
+<header class="navbar" id="navbar">
+  <!-- This "D" mark's path must stay pixel-identical to the copy in the
+       footer below, in components.js's LOGO_MARK_PATH_D, and in
+       assets/favicon.svg — it can't be a shared JS component here (navbar
+       must render immediately, before any script runs). -->
+  <div class="container navbar__inner">
+    <a href="#top" class="logo" aria-label="DocsLean home" title="DocsLean"><span class="sr-only">D</span><svg class="logo__mark" viewBox="0 0 13 15" width="13" height="15" aria-hidden="true"><path d="M0 14.2V0H4.9C7.20667 0 8.98 0.62 10.22 1.86C11.46 3.08667 12.08 4.84 12.08 7.12C12.08 9.38667 12.08 14.2 12.08 14.2C10.5 14.2 7.28667 14.2 5.02 14.2H0ZM3.04 11.64H4.9C6.27333 11.64 7.28667 11.2733 7.94 10.54C8.60667 9.79333 8.94 8.64667 8.94 7.1C8.94 5.55333 8.60667 4.41333 7.94 3.68C7.28667 2.93333 6.27333 2.56 4.9 2.56H3.04V11.64Z" fill="currentColor"/></svg><span class="logo__text">ocsLean</span>
+    </a>
+
+    <nav class="navbar__nav" id="navbar-nav">
+      <a href="#how-it-works">How it works</a>
+      <a href="#what-changes">What changes</a>
+      <a href="#product">Product</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+
+    <button class="navbar__burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="navbar-nav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="container hero__inner">
+      <div class="hero__content">
+        <h1 class="hero__title">Outdated documentation, automatically found.</h1>
+        <p class="hero__subtitle">Built for growing teams that no longer have time to review every page manually.</p>
+        <a href="#faq" class="button button--accent">Start a Free Audit</a>
+      </div>
+      <div class="hero__visual" role="img" aria-label="Preview of a 62% documentation health score next to a list of priority action items.">
+        <!-- HeroCard1/HeroCard2 = the exact same .stat-card--neutral and
+             "Priority Action Items" .panel used inside the full dashboard
+             in the Deep-dive section below (styles/dashboard.css,
+             components.js) — not separate hero-only artwork. A design
+             change to either one propagates to both places automatically. -->
+        <div class="hero-card--panel-wrap fade-in">
+          <div class="hero-card--panel" data-component="priority-panel"></div>
+        </div>
+        <div class="hero-card--score fade-in" data-component="score-card"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section fade-in" id="how-it-works">
+    <div class="container">
+      <h2>From Notion Workspace to Action Plan in Three Steps</h2>
+      <p class="section__subtitle">No manual review required.</p>
+      <ol class="steps">
+        <li class="step">
+          <span class="step__number">1</span>
+          <h3>Connect Your Notion Docs</h3>
+          <p>Link your Notion workspace and grant secure, read-only access in under a minute.</p>
+        </li>
+        <li class="step">
+          <span class="step__number">2</span>
+          <h3>We Scan Every Page</h3>
+          <p>DocsLean checks every page for content that is outdated, duplicated, or contradictory.</p>
+        </li>
+        <li class="step">
+          <span class="step__number">3</span>
+          <h3>Receive Your Top Priorities</h3>
+          <p>The most critical pages get ranked first, so your team knows exactly where to begin.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tinted fade-in" id="what-changes">
+    <div class="container">
+      <h2>What Your Documentation Looks Like Without and With DocsLean</h2>
+      <p class="section__subtitle">From an unclear sense that something is wrong to a documented, actionable plan.</p>
+
+      <div class="compare">
+        <div class="compare__card compare__card--before">
+          <h3 class="compare__title">Without DocsLean</h3>
+          <ul class="compare__rows">
+            <li class="compare__row fade-in"><i class="ph ph-x" aria-hidden="true"></i><span>No <strong>clear place</strong> to start cleaning up outdated pages</span></li>
+            <li class="compare__row fade-in"><i class="ph ph-x" aria-hidden="true"></i><span>One outdated page can <strong>undermine team trust</strong></span></li>
+            <li class="compare__row fade-in"><i class="ph ph-x" aria-hidden="true"></i><span>Critical knowledge is <strong>lost</strong> when an employee leaves</span></li>
+            <li class="compare__row fade-in"><i class="ph ph-x" aria-hidden="true"></i><span><strong>Hours lost</strong> weekly searching for the right document</span></li>
+          </ul>
+        </div>
+        <div class="compare__card compare__card--after">
+          <h3 class="compare__title">With DocsLean</h3>
+          <ul class="compare__rows">
+            <li class="compare__row fade-in"><i class="ph ph-check" aria-hidden="true"></i><span>A <strong>prioritized list</strong> of the five pages to fix first</span></li>
+            <li class="compare__row fade-in"><i class="ph ph-check" aria-hidden="true"></i><span>Every flagged page includes a <strong>clear explanation</strong></span></li>
+            <li class="compare__row fade-in"><i class="ph ph-check" aria-hidden="true"></i><span>The health score <strong>updates automatically</strong> each week</span></li>
+            <li class="compare__row fade-in"><i class="ph ph-check" aria-hidden="true"></i><span>Pages are ranked by <strong>actual risk</strong>, not by age</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat__value">61%</div>
+          <div class="stat__label">of employees redo work that already exists in the organization</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">1–5 hrs/day</div>
+          <div class="stat__label">spent searching for the correct document</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">27%</div>
+          <div class="stat__label">of remote employees trust their documentation is up to date</div>
+        </div>
+      </div>
+      <p class="stats__caption">These figures come from 2024 workplace research by Guru and Huddle.</p>
+    </div>
+  </section>
+
+  <section class="section fade-in" id="product">
+    <div class="container">
+      <h2>Every Flagged Page Comes With a Clear, Documented Explanation</h2>
+      <p class="section__subtitle">Along with a recommended next step.</p>
+      <div class="dashboard-frame" role="img" aria-label="Dashboard showing flagged pages, each with an explanation and a recommended action.">
+        <!-- The full dashboard, same single source as HeroCard1/HeroCard2
+             above (components.js) — not a separate screenshot or mockup.
+             .dashboard-frame__scale is measured and transform:scale()'d by
+             components.js at desktop widths (the dashboard's internal
+             nowrap table content doesn't reflow to fit --container-max-width
+             on its own — max-width:100% alone clips it instead of shrinking
+             it). Below the 1025px breakpoint, dashboard.css's own responsive
+             rules take over instead (real restructuring, not scaling). -->
+        <div class="dashboard-frame__scale" data-component="dashboard"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tinted fade-in" id="faq">
+    <div class="container cta-faq">
+      <div class="cta-faq__head">
+        <h2>Ready to Take Control of Your Documentation?</h2>
+        <p class="section__subtitle">Your first documentation audit is completely free, with no obligation to continue.</p>
+        <a href="#top" class="button button--accent">Start a Free Audit</a>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="false">How is our internal content handled?<i class="ph ph-caret-down accordion__chevron" aria-hidden="true"></i></button>
+          <div class="accordion__panel">
+            <p>Content is accessed only during the scanning process. Nothing is stored, and no changes are made without explicit approval.</p>
+          </div>
+        </div>
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="false">Is any content modified automatically?<i class="ph ph-caret-down accordion__chevron" aria-hidden="true"></i></button>
+          <div class="accordion__panel">
+            <p>No. DocsLean identifies and recommends changes only. Every action requires explicit user approval.</p>
+          </div>
+        </div>
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="false">How is an outdated page identified, rather than simply an older one?<i class="ph ph-caret-down accordion__chevron" aria-hidden="true"></i></button>
+          <div class="accordion__panel">
+            <p>Each flagged page includes a documented explanation — for example, a contradiction with another page, or a related process that has since changed.</p>
+          </div>
+        </div>
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="false">Which platform does DocsLean currently support?<i class="ph ph-caret-down accordion__chevron" aria-hidden="true"></i></button>
+          <div class="accordion__panel">
+            <p>This version supports integration with Notion. Additional platforms are planned for future releases.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <!-- Same path as the navbar logo above — keep in sync (see its comment). -->
+      <a href="#top" class="logo" aria-label="DocsLean home" title="DocsLean"><span class="sr-only">D</span><svg class="logo__mark" viewBox="0 0 13 15" width="13" height="15" aria-hidden="true"><path d="M0 14.2V0H4.9C7.20667 0 8.98 0.62 10.22 1.86C11.46 3.08667 12.08 4.84 12.08 7.12C12.08 9.38667 12.08 14.2 12.08 14.2C10.5 14.2 7.28667 14.2 5.02 14.2H0ZM3.04 11.64H4.9C6.27333 11.64 7.28667 11.2733 7.94 10.54C8.60667 9.79333 8.94 8.64667 8.94 7.1C8.94 5.55333 8.60667 4.41333 7.94 3.68C7.28667 2.93333 6.27333 2.56 4.9 2.56H3.04V11.64Z" fill="currentColor"/></svg><span class="logo__text">ocsLean</span></a>
+      <p class="footer__tagline">Documentation your organization can rely on.</p>
+    </div>
+    <div class="footer__meta">
+      <p class="footer__copyright">© 2026 DocsLean</p>
+      <a href="mailto:team@docslean.com" class="footer__email">team@docslean.com</a>
+    </div>
+  </div>
+</footer>
+
+<!-- script.js first: it attaches the 'dashboard-components-mounted'
+     listener that components.js's mount function dispatches to. Both run
+     synchronously in document order here (no defer), so this order is
+     load-bearing — reversing it means the event fires before anything is
+     listening for it. -->
+<script src="script.js"></script>
+<script src="components.js"></script>
+</body>
+</html>

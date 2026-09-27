@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- colors from styles/tokens.css: --color-primary (#4F46E5), --color-text-on-dark (#FFFFFF) -->
+  <!-- This "D" path must stay pixel-identical to index.html's navbar/footer
+       logo and components.js's LOGO_MARK_PATH_D — can't be a shared
+       component (this file is loaded by the browser before any JS runs). -->
+  <rect width="32" height="32" fill="#4F46E5"/>
+  <g transform="translate(8.345,7) scale(1.2676)">
+    <path d="M0 14.2V0H4.9C7.20667 0 8.98 0.62 10.22 1.86C11.46 3.08667 12.08 4.84 12.08 7.12C12.08 9.38667 12.08 14.2 12.08 14.2C10.5 14.2 7.28667 14.2 5.02 14.2H0ZM3.04 11.64H4.9C6.27333 11.64 7.28667 11.2733 7.94 10.54C8.60667 9.79333 8.94 8.64667 8.94 7.1C8.94 5.55333 8.60667 4.41333 7.94 3.68C7.28667 2.93333 6.27333 2.56 4.9 2.56H3.04V11.64Z" fill="#FFFFFF"/>
+  </g>
+</svg>
