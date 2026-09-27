@@ -1,0 +1,460 @@
+/* ==========================================================================
+   DocsLean — Dashboard component styles
+   Shared by: dashboard-preview.html (standalone) AND index.html
+   (hero's HeroCard1/HeroCard2 + the Deep-dive section's full dashboard).
+   One source of truth — never duplicate these rules into another file.
+   Uses tokens from styles/tokens.css.
+   ========================================================================== */
+
+:root {
+  /* Shared "strong" divider — plain --color-surface-2 read as too faint
+     for actual separator lines (table rows, panel borders, rail). */
+  --divider-strong: color-mix(in srgb, var(--color-text-secondary) 35%, transparent);
+  /* Darker purple tint used for the table's header row AND its side
+     borders, so the border reads as the same "color" as the row. */
+  --table-header-tint: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface-1));
+}
+
+/* shared: badges (tinted bg from the token, text in the WCAG-safe variant) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  /* 4px vertical — half of --space-1, off the 8px scale on purpose, same
+     kind of documented exception as .mock-checkbox's 4px radius. 8px
+     made the pill visibly too tall for a caption-size label. */
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.badge--critical { background: color-mix(in srgb, var(--color-score-critical) 14%, white); color: var(--color-score-critical); }
+.badge--warning  { background: color-mix(in srgb, var(--color-score-warning) 14%, white); color: var(--color-score-warning-text); }
+.badge--good     { background: color-mix(in srgb, var(--color-score-good) 14%, white); color: var(--color-score-good-text); }
+
+/* Smaller radius than --radius-base on purpose: at 18px, an 8px radius
+   reads as a circle (looks like a radio button, not a checkbox). Half
+   of --radius-base keeps it recognizably square. */
+.mock-checkbox {
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--color-text-secondary);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Plain by default — repeated many times per row (table, task cards);
+   a border on every one of them would be too much visual noise. */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: var(--radius-base);
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+/* Framed + fully round — only for a standalone button next to the pill
+   toolbar buttons (the "..." overflow menu), so it reads as one family. */
+.icon-btn--framed {
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-surface-2);
+  background: var(--color-surface-0);
+}
+/* flex-start, not flex-end — every other column is left-aligned, and
+   this makes the "Actions" header sit on the same vertical line as
+   where the icons actually start. */
+.actions-row { display: flex; justify-content: flex-start; align-items: center; gap: var(--space-1); }
+
+/* Shared "task detail" block — the expanded plan item's own layout. */
+.task-detail { display: flex; flex-direction: column; gap: var(--space-2); }
+.task-detail__row { display: flex; align-items: center; gap: var(--space-2); }
+.task-detail__row .title { flex-grow: 1; min-width: 0; font-size: var(--font-size-body-sm); font-weight: var(--font-weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-wrap: pretty; }
+.task-detail__row i.chevron { color: var(--color-text-secondary); font-size: 16px; flex-shrink: 0; }
+/* body-sm, not caption — caption read as too small for a section label.
+   No uppercase/letter-spacing "eyebrow" treatment — that would be a
+   typographic convention this project doesn't use anywhere else. */
+.field-label { display: flex; align-items: center; gap: var(--space-1); font-size: var(--font-size-body-sm); font-weight: var(--font-weight-semibold); color: var(--color-text-secondary); margin-bottom: var(--space-1); }
+/* 16px, not 12 — the next legitimate tier in the established icon scale
+   (12/16/18/20/24), matching the bigger label text, not an arbitrary value. */
+.field-label i { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+/* Solution's label is green (not purple) — purple is now "Open the flagged
+   file"'s own link color inside the same list, and having the section
+   label and a link share one color made them read as the same thing.
+   --color-score-good-text, not the raw --color-score-good token — the raw
+   value fails WCAG AA as text (tokens.css's own note); the -text variant
+   is the one already built for exactly this. */
+.field-label--accent { color: var(--color-score-good-text); }
+/* Vertical accent bar down the whole block, not just the label — extends
+   the same color cue (neutral=problem, green=fix) across the full block
+   instead of just 2 words, so the two are distinguishable at a glance. */
+.task-detail__field--reason, .task-detail__field--solution {
+  padding-left: var(--space-2);
+  border-left: 2px solid var(--divider-strong);
+}
+.task-detail__field--solution { border-left-color: var(--color-score-good-text); }
+.task-detail__field--reason { margin-top: var(--space-1); }
+.task-detail__explain { font-size: var(--font-size-body-sm); color: var(--color-text-secondary); line-height: var(--line-height-body); margin: 0; text-wrap: pretty; }
+/* Explicit list-style, not the browser default — main.css resets
+   ol/ul{list-style:none} site-wide, which silently wins here too whenever
+   this component is used on a page that loads main.css (hero, Deep-dive).
+   dashboard-preview.html never hit this since it never loaded main.css.
+   decimal (1. 2. 3.), not bullets — this is now a fixed, generic 3-step
+   sequence (same wording for every task), not a variable list of custom
+   points, so numbering it reads more like "the process" than "some notes". */
+/* Custom counter + flex row instead of native list markers — a native
+   ::marker's vertical position is inconsistent across items (especially
+   next to an inline icon on the same line, like item 1's), and can't be
+   flex-aligned since it isn't a real flex child. This gives full control:
+   the number sits in its own box, vertically centered against whatever
+   else is on that row (text or the "Open the flagged file" link+icon). */
+.task-detail__solution { margin: 0; padding-left: 0; list-style: none; counter-reset: solution-step; font-size: var(--font-size-body-sm); color: var(--color-text-secondary); line-height: var(--line-height-body); }
+.task-detail__solution li {
+  counter-increment: solution-step;
+  display: flex;
+  align-items: flex-start; /* aligns the number with the FIRST line if the text wraps, not the block's vertical middle */
+  gap: var(--space-1);
+  text-wrap: pretty;
+}
+/* Same 16px width as .field-label i's icon box above — a bare "1." has
+   its own (narrower, variable) natural width, so without this the digits
+   just happen to start at the shared left edge but aren't centered on the
+   same visual column as the icon. Fixed width + centered text puts both
+   the icon and every marker in an identical slot. */
+.task-detail__solution li::before {
+  content: counter(solution-step) ".";
+  width: 16px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.task-detail__solution li + li { margin-top: var(--space-1); }
+/* Step 1 is now the "open file" action itself, not a separate row below
+   the list — same visual language as .panel__footer a ("View all 184
+   pages →"): colored + icon, inline with the rest of this numbered item. */
+.task-detail__solution-link { display: inline-flex; align-items: center; gap: var(--space-1); text-decoration: none; font-weight: var(--font-weight-medium); color: var(--color-primary); }
+.task-detail__solution-link i { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+
+/* ============================== FULL DASHBOARD (reference: 1440x900) ============================== */
+.dashboard {
+  width: 1440px;
+  max-width: 100%;
+  background: var(--color-surface-0);
+  color: var(--color-text-primary); /* same reasoning as .panel above */
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-card), var(--shadow-dashboard);
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* ---- icon rail ---- */
+/* 88px wide so a 40px icon, CENTERED, lands exactly 24px (--space-3) from
+   both the rail's left AND right edge — matching the header's own 24px
+   inset to the avatar. */
+.rail {
+  width: 88px;
+  flex-shrink: 0;
+  background: var(--color-surface-1);
+  border-right: 1px solid var(--divider-strong);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.rail__top {
+  height: 80px;
+  width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid var(--divider-strong);
+  flex-shrink: 0;
+}
+.rail__logo {
+  /* Same 40x40 footprint as .rail__icon (not its own 36px) so centering
+     it lands on the exact same 24px inset as the icons. */
+  width: 40px; height: 40px;
+  border-radius: var(--radius-base);
+  background: var(--color-primary);
+  color: var(--color-text-on-dark);
+  display: flex; align-items: center; justify-content: center;
+}
+.rail__nav { display: flex; flex-direction: column; align-items: center; padding: var(--space-4) 0 var(--space-3) 0; flex-grow: 1; }
+.rail__icon {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-base);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: 20px;
+  margin-bottom: var(--space-2);
+}
+/* Soft tint, not solid --color-primary — solid was identical to the logo
+   mark above it, making the active nav item read as a second logo. */
+.rail__icon--active { background: color-mix(in srgb, var(--color-primary) 15%, white); color: var(--color-primary); }
+.rail__divider { width: 28px; height: 1px; background: var(--divider-strong); margin: 0 0 var(--space-2) 0; }
+.rail__spacer { flex-grow: 1; }
+
+/* ---- main content ---- */
+.dashboard__main { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.dashboard__header { height: 80px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-3); border-bottom: 1px solid var(--divider-strong); }
+.dashboard__header .page-title { margin: 0; font-size: var(--font-size-h3); line-height: var(--line-height-heading); font-weight: var(--font-weight-semibold); letter-spacing: var(--letter-spacing-h3); }
+
+/* Heading kept close to the stats it describes (space-1→subtitle,
+   space-3→cards); a bigger gap (space-6) separates the stats from the
+   independent table+plan section below — proximity rule. */
+.dashboard__body { padding: var(--space-4) var(--space-3) var(--space-5); display: flex; flex-direction: column; }
+
+/* Two groups — search alone / bell+profile together. */
+.dashboard__header-right { display: flex; align-items: center; gap: var(--space-4); }
+.header-group { display: flex; align-items: center; gap: var(--space-2); }
+.search { position: relative; }
+.search i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-secondary); font-size: 18px; }
+.search input {
+  width: 220px;
+  height: 34px;
+  padding: 0 var(--space-2) 0 30px;
+  border-radius: var(--radius-base);
+  border: 1px solid var(--color-surface-2);
+  background: var(--color-surface-1);
+  font-family: inherit;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-primary);
+}
+.search input::placeholder { color: var(--color-text-secondary); }
+.header-icon {
+  position: relative;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  color: var(--color-text-secondary);
+}
+.header-icon .dot { position: absolute; top: -2px; right: -2px; width: 7px; height: 7px; border-radius: 50%; background: var(--color-score-critical); border: 1.5px solid var(--color-surface-0); }
+/* Initials, not a hotlinked photo — no external dependency/fallback risk. */
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary); color: var(--color-text-on-dark); display: flex; align-items: center; justify-content: center; font-size: var(--font-size-caption); font-weight: var(--font-weight-semibold); flex-shrink: 0; }
+
+/* .dashboard .section-heading (specificity 0,2,0), not just .section-heading
+   (0,1,0) — main.css's site-wide ".section h2{text-align:center}" (0,1,1)
+   otherwise wins and centers this, since this heading now lives inside a
+   <section> in the Deep-dive embed. */
+.dashboard .section-heading { text-align: left; margin-left: 0; margin-right: 0; font-size: var(--font-size-subheading); line-height: 40px; font-weight: var(--font-weight-semibold); margin-top: 0; margin-bottom: var(--space-1); }
+/* Applies to all 4 cards below (page count + scan cadence are the basis
+   for every one of them), not just the health-score card. */
+.stats-subtitle { font-size: var(--font-size-body-sm); color: var(--color-text-secondary); margin: 0 0 var(--space-3) 0; }
+
+/* 4 equal cards, one consistent card style (white + border) for all of
+   them, including health score — the "aggregate, not a 4th equal thing"
+   distinction comes from its own content (a % + full-width bar), not from
+   breaking the shared card shape. */
+.stats-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin-bottom: var(--space-6); }
+.stat-card {
+  background: var(--color-surface-0);
+  color: var(--color-text-primary); /* same reasoning as .panel above */
+  border: 1px solid var(--color-surface-2);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-3);
+  display: flex; flex-direction: column; gap: var(--space-2);
+}
+.stat-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-base);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  color: var(--color-text-on-dark);
+}
+.stat-card--neutral .stat-card__icon { background: var(--color-primary); }
+.stat-card--critical .stat-card__icon { background: var(--color-score-critical); }
+/* Darkened from the raw token — white-on-raw-warning is 2.80:1, below the
+   3:1 WCAG minimum for graphical objects. Same fix tokens.css already
+   used for --color-score-warning-text, applied to an icon bg instead. */
+.stat-card--warning .stat-card__icon { background: color-mix(in srgb, var(--color-score-warning) 80%, black); }
+/* Raw good was 3.30:1 — technically passing but almost no margin. */
+.stat-card--good .stat-card__icon { background: color-mix(in srgb, var(--color-score-good) 90%, black); }
+.stat-card__label { font-size: var(--font-size-caption); color: var(--color-text-secondary); }
+/* Always plain text-primary, not a per-category color — the icon already
+   carries the category color; a big colored number on a white card read
+   as garish rather than clearer. */
+.stat-card__value { font-size: var(--font-size-h2); font-weight: var(--font-weight-semibold); line-height: 1.1; color: var(--color-text-primary); }
+/* margin-top:auto — pins the bar to the card's bottom edge regardless of
+   how many lines the label/value above take. */
+.stat-card__bar-track { margin-top: auto; height: 4px; border-radius: var(--radius-pill); overflow: hidden; background: var(--color-surface-2); }
+.stat-card__bar-fill { display: block; height: 100%; }
+.stat-card--critical .stat-card__bar-fill { background: var(--color-score-critical); }
+.stat-card--warning .stat-card__bar-fill { background: var(--color-score-warning); }
+.stat-card--good .stat-card__bar-fill { background: var(--color-score-good); }
+
+/* 3fr/2fr (60/40), not 2fr/1fr — the plan panel is the product's
+   actionable core, not a secondary sidebar to the table. */
+/* align-items:start, not stretch — stretch forced the table panel's
+   height onto the (shorter) plan panel, leaving unused space after its
+   last row before hitting its own padding. components.js measures the
+   plan panel's OWN natural height and applies it to the table panel
+   instead (the table panel's existing flex-grow+margin-top:auto already
+   absorbs that height gracefully — see .table-frame/.panel__footer). */
+.dashboard__cols { display: grid; grid-template-columns: 3fr 2fr; gap: var(--space-5); align-items: start; }
+.dashboard__cols .panel { display: flex; flex-direction: column; }
+
+/* Explicit color, not inherited — this component gets reused inside the
+   hero, where the ancestor sets white text for the headline. Without its
+   own color, every descendant text node here (h3, h4, task titles) that
+   doesn't set its own color would silently inherit that white instead of
+   the dark text it actually needs on this light surface. */
+.panel { border-radius: var(--radius-base); padding: var(--space-4); background: var(--color-surface-1); box-shadow: var(--shadow-card); color: var(--color-text-primary); }
+.panel__head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: var(--space-3); }
+.panel__head h3 { margin: 0; display: flex; align-items: baseline; gap: var(--space-2); font-size: var(--font-size-subheading); line-height: var(--line-height-heading); font-weight: var(--font-weight-semibold); }
+.panel__head h3 .count-inline { font-size: var(--font-size-caption); font-weight: var(--font-weight-regular); color: var(--color-text-secondary); }
+.panel__subtitle { font-size: var(--font-size-body-sm); color: var(--color-text-secondary); margin-top: var(--space-1); }
+
+.toolbar { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
+.pill-btn {
+  display: inline-flex; align-items: center; gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-surface-2);
+  background: var(--color-surface-0);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+}
+.pill-btn i { font-size: 12px; }
+
+/* border-radius+overflow:hidden on <table> itself doesn't work under
+   border-collapse:collapse (browsers ignore it) — a wrapper div sidesteps
+   that. Side border lines live on .table-sides (wraps just the table), so
+   they stop at the table's bottom edge instead of running past the last
+   row into the footer's empty space. Radius/overflow live on the OUTER
+   .table-frame (clips the whole compound shape, table + footer). */
+.table-frame { display: flex; flex-direction: column; flex-grow: 1; border-radius: var(--radius-base); overflow: hidden; }
+.table-sides { border-left: 1px solid var(--table-header-tint); border-right: 1px solid var(--table-header-tint); }
+table.pages {
+  width: 100%;
+  flex-grow: 0;
+  border-collapse: collapse;
+}
+table.pages thead th {
+  text-align: left;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-2);
+  background: var(--table-header-tint);
+}
+table.pages thead th:first-child { border-radius: var(--radius-base) 0 0 var(--radius-base); }
+table.pages thead th:last-child { border-radius: 0 var(--radius-base) var(--radius-base) 0; }
+table.pages td { padding: var(--space-2); border-bottom: 1px solid var(--divider-strong); font-size: var(--font-size-body-sm); vertical-align: middle; }
+table.pages tr:last-child td { border-bottom: none; }
+/* One more (faded) row instead of the table cutting off flat — signals
+   "there are more pages below". */
+.pages-ghost-row { opacity: 0.4; }
+.page-name { display: flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
+.page-name i { font-size: 24px; flex-shrink: 0; color: var(--color-text-secondary); }
+.page-name .meta { display: flex; flex-direction: column; }
+.page-name .word-count { font-size: var(--font-size-caption); color: var(--color-text-secondary); font-weight: var(--font-weight-regular); }
+.page-space { color: var(--color-text-secondary); white-space: nowrap; }
+.page-edited { color: var(--color-text-secondary); white-space: nowrap; }
+
+.panel__footer { display: flex; justify-content: center; margin-top: auto; padding: var(--space-3); }
+.panel__footer a { display: inline-flex; align-items: center; gap: var(--space-1); text-decoration: none; font-size: var(--font-size-body-sm); font-weight: var(--font-weight-medium); color: var(--color-primary); }
+.panel__footer a i { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+
+.plan-tabs { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-1); background: var(--color-surface-2); border-radius: var(--radius-base); padding: var(--space-1); margin-bottom: var(--space-3); }
+.plan-tab { text-align: center; padding: var(--space-1) 0; border-radius: var(--radius-base); font-size: var(--font-size-caption); font-weight: var(--font-weight-semibold); }
+.plan-tab--active { background: var(--color-surface-0); color: var(--color-text-primary); box-shadow: var(--shadow-card); }
+.plan-tab--inactive { color: var(--color-text-secondary); }
+
+.plan-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+.plan-section-head h4 { margin: 0; font-size: var(--font-size-subheading); line-height: var(--line-height-heading); font-weight: var(--font-weight-semibold); }
+/* Reusable "view full X" secondary action for a section with exactly one
+   such action — the icon-only form of .panel__footer's text link, for a
+   spot with no room for link text. */
+.icon-circle-outline {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--color-primary) 45%, white);
+  color: color-mix(in srgb, var(--color-primary) 45%, white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.plan-item--expanded { padding-bottom: var(--space-3); margin-bottom: 0; border-bottom: 1px solid var(--divider-strong); }
+
+.plan-item--collapsed { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) 0; border-bottom: 1px solid var(--divider-strong); }
+.plan-item--collapsed:last-child { border-bottom: none; }
+.plan-item--collapsed span.title { flex-grow: 1; min-width: 0; font-size: var(--font-size-body-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.plan-item--collapsed i.chevron { color: var(--color-text-secondary); font-size: 16px; }
+
+/* ==========================================================================
+   HeroCard wrappers — HeroCard1 (.stat-card--neutral) and HeroCard2 (the
+   "Priority Action Items" .panel) reused standalone in the landing page's
+   hero. Outside their normal grid parents (.stats-row / .dashboard__cols),
+   they need an explicit width matching how they actually render inside the
+   1440px dashboard, since "full/true size" means matching that, not an
+   arbitrary hero-only size.
+   ========================================================================== */
+.hero-card--score { width: 308px; flex-shrink: 0; }
+/* True original width (506px) — this gets shrunk via transform:scale(0.5)
+   in main.css/components.js now, not by changing width (a real proportional
+   shrink, like Figma's scale tool, not a narrower column that just wraps
+   the same-size content). The full dashboard's own copy of this panel
+   (Deep-dive) is unaffected — it's sized by .dashboard__cols' grid instead. */
+.hero-card--panel { width: 506px; flex-shrink: 0; }
+
+/* ==========================================================================
+   RESPONSIVE — the dashboard itself, per CLAUDE.md breakpoints
+   (mobile <640px, tablet 641-1024px, desktop 1025px+). Desktop-first:
+   base rules above are the 1025px+ desktop layout, unchanged here.
+   ========================================================================== */
+@media (max-width: 1024px) {
+  /* Stat cards: 4-in-a-row → 2x2. Rail stays narrow/icon-only (it doesn't
+     need the width back), so it's unchanged. */
+  .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* Table + plan panel: side-by-side → stacked, table first (it's the
+     wider, more content-dense one) full width, then the plan panel full
+     width below it — not squeezed into a narrow shared row. */
+  .dashboard__cols { grid-template-columns: 1fr; }
+  .dashboard__cols .panel { height: auto; }
+}
+
+@media (max-width: 640px) {
+  /* Rail collapses into a simple top bar: just the logo, full width,
+     no icon list (there's no room for a vertical icon column at this
+     width, and the icons aren't reachable via a mobile nav pattern here
+     yet — matches CLAUDE.md's "adapt layout, not styling" rule: same
+     colors/radius, different structure). */
+  .dashboard { flex-direction: column; width: 100%; }
+  .rail { width: 100%; flex-direction: row; border-right: none; border-bottom: 1px solid var(--divider-strong); }
+  .rail__top { width: auto; height: 56px; border-bottom: none; padding: 0 var(--space-3); }
+  .rail__nav { display: none; }
+
+  .dashboard__header { flex-wrap: wrap; height: auto; padding: var(--space-2) var(--space-3); gap: var(--space-2); }
+  .dashboard__header-right { flex-wrap: wrap; gap: var(--space-2); }
+  .search input { width: 100%; }
+
+  .dashboard__body { padding: var(--space-3); }
+  .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+
+  /* "All Pages" table: a <table> with 5 columns doesn't survive a narrow
+     screen by shrinking columns — it truncates or forces horizontal
+     scroll either way. Rebuilt as a stack of row-cards instead: table
+     semantics stay (still a <table>) but each row's cells reflow onto
+     their own lines via display overrides, so no column ever needs to
+     shrink below its content. */
+  table.pages, table.pages thead, table.pages tbody, table.pages tr, table.pages td { display: block; width: 100%; }
+  table.pages thead { display: none; }
+  table.pages tr { padding: var(--space-2) 0; border-bottom: 1px solid var(--divider-strong); }
+  table.pages tr:last-child { border-bottom: none; }
+  table.pages td { padding: var(--space-1) 0; border-bottom: none; }
+  table.pages td:first-child { padding-bottom: var(--space-1); }
+  /* Risk badge sits on the name's own row (name + badge), date/actions
+     drop to the row below — matches the "name+level one line, date+actions
+     next line" mini-card pattern. */
+  table.pages tr { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-2); }
+  table.pages td:nth-child(1) { order: 1; flex: 1 1 auto; min-width: 0; }
+  table.pages td:nth-child(3) { order: 2; flex-shrink: 0; }
+  table.pages td:nth-child(2) { order: 3; flex: 1 1 100%; font-size: var(--font-size-caption); }
+  table.pages td:nth-child(4) { order: 4; font-size: var(--font-size-caption); }
+  table.pages td:nth-child(5) { order: 5; margin-left: auto; }
+  .page-name { white-space: normal; }
+
+  .dashboard__cols { gap: var(--space-3); }
+  .panel { padding: var(--space-3); }
+}
