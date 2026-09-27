@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-  <!-- colors from styles/tokens.css: --color-primary (#4F46E5), --color-text-on-dark (#FFFFFF) -->
+  <!-- colors from styles/tokens.css: color-primary (#4F46E5), color-text-on-dark (#FFFFFF) -->
   <!-- This "D" path must stay pixel-identical to index.html's navbar/footer
        logo and components.js's LOGO_MARK_PATH_D — can't be a shared
        component (this file is loaded by the browser before any JS runs). -->
