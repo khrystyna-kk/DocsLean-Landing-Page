@@ -175,30 +175,32 @@ h3 {
 
 .navbar__burger {
   display: none;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  gap: var(--space-1);
+  justify-content: center;
   width: 44px;
   height: 44px;
   background: none;
   border: none;
   padding: 0;
+  font-size: 24px;
+  color: var(--color-text-on-dark);
   cursor: pointer;
-}
-.navbar__burger span {
-  width: 22px;
-  height: 2px;
-  background: var(--color-text-on-dark);
   transition: var(--transition-base);
 }
-.navbar.scrolled .navbar__burger span { background: var(--color-text-primary); }
+.navbar.scrolled .navbar__burger { color: var(--color-text-primary); }
 
 /* ------------------------------------------------------------------------
    HERO
    ------------------------------------------------------------------------
-   No forced min-height — height is purely content-driven, the next
-   section starts right where this one's content ends.
+   min-height:100vh on desktop only — content-driven height alone let the
+   hero end up either taller OR shorter than the actual viewport depending
+   on the user's screen, and "shorter" meant the next section's white
+   background became visible in the first screenful, before any scrolling.
+   This only sets a FLOOR (min-height), so genuinely tall content can still
+   grow past 100vh — it never clips anything, just guarantees the hero
+   always covers at least the first viewport. Reset back to auto below
+   1025px (see media query) — mobile/tablet stack hero content vertically
+   and don't have this problem.
    The two blocks (.hero__content and .hero__visual) are centered against
    each other (align-items:center) — a flex-start variant (text top lined
    up with HeroCard2's top) was tried and reverted back to this. */
@@ -206,6 +208,9 @@ h3 {
   background: var(--color-primary);
   color: var(--color-text-on-dark);
   padding: var(--space-8) 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
 }
 .hero__inner {
   display: flex;
@@ -515,6 +520,9 @@ h3 {
   padding: var(--space-3);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
+  /* Explicit, not inherited — a bare <button> doesn't reliably inherit the
+     page's text color across browsers/OS themes the way a <div>/<p> would. */
+  color: var(--color-text-primary);
   cursor: pointer;
   text-wrap: balance; /* 660px fits the longest question (68 chars) on one line; this is a safety net */
 }
@@ -591,25 +599,36 @@ h3 {
      force horizontal clipping here instead of letting that reflow happen. */
   .dashboard-frame__scale { width: 100%; }
 
+  /* min-height:100vh is a desktop-only fix (see the HERO section comment
+     above) — mobile/tablet stack hero content vertically and don't have
+     the "next section peeking through" problem, so keep this content-driven
+     here instead of forcing a tall, mostly-empty hero on small screens. */
+  .hero { min-height: auto; display: block; }
   /* HeroCard2 alone plus the text column doesn't fit side by side below
-     ~1024px — stacks the same way mobile does (.hero's own height is
-     already content-driven at every breakpoint now, nothing to override). */
-  .hero__inner { flex-direction: column; align-items: stretch; }
+     ~1024px — stacks the same way mobile does. gap:var(--space-4) — the
+     desktop rule's gap (var(--space-8), 80px) exists to space text and
+     cards apart HORIZONTALLY; once this becomes a column, that same gap
+     value turns into 80px of dead vertical space between them instead,
+     which is what was actually causing the oversized gap here (not
+     .hero__visual's own margin below). */
+  .hero__inner { flex-direction: column; align-items: stretch; gap: var(--space-4); }
   .hero__content { padding-top: 0; }
   /* Undo the JS-set inline styles (width/height/transform/top/left) from
      layoutHeroCards() — inline styles otherwise beat these media-query
      rules regardless of viewport. components.js's own resize handler also
      clears them below this breakpoint, but this is the fallback in case
      that hasn't re-run yet (e.g. page loaded directly at this width). */
-  .hero__visual { width: 100% !important; height: auto !important; margin-top: var(--space-4); }
+  .hero__visual { width: 100% !important; height: auto !important; }
   .hero-card--panel-wrap { position: static !important; width: 100% !important; height: auto !important; overflow: visible; }
   .hero-card--panel { position: static !important; width: 100% !important; transform: none !important; margin-bottom: var(--space-3); }
   .hero-card--score { position: static !important; width: 100% !important; top: auto !important; left: auto !important; transform: none !important; margin-bottom: var(--space-3); }
 }
 
 @media (max-width: 640px) {
-  /* Hero stacking is already handled by the ≤1024px block above (mobile
-     widths match that query too) — nothing hero-specific needed here. */
+  /* Hero stacking itself is handled by the ≤1024px block above (mobile
+     widths match that query too) — this just tightens .hero__inner's own
+     gap further for true mobile (tablet keeps --space-4). */
+  .hero__inner { gap: var(--space-2); }
   .section { padding: var(--space-6) 0; }
 
   .steps { grid-template-columns: 1fr; }

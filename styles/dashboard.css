@@ -128,9 +128,10 @@
 }
 .task-detail__solution li + li { margin-top: var(--space-1); }
 /* Step 1 is now the "open file" action itself, not a separate row below
-   the list — same visual language as .panel__footer a ("View all 184
-   pages →"): colored + icon, inline with the rest of this numbered item. */
-.task-detail__solution-link { display: inline-flex; align-items: center; gap: var(--space-1); text-decoration: none; font-weight: var(--font-weight-medium); color: var(--color-primary); }
+   the list — same visual language as .panel__footer's span ("View all 184
+   pages →"): colored + icon, inline with the rest of this numbered item.
+   span, not a — static mockup, must not be a real clickable link. */
+.task-detail__solution-link { display: inline-flex; align-items: center; gap: var(--space-1); font-weight: var(--font-weight-medium); color: var(--color-primary); }
 .task-detail__solution-link i { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
 
 /* ============================== FULL DASHBOARD (reference: 1440x900) ============================== */
@@ -175,6 +176,31 @@
   color: var(--color-text-on-dark);
   display: flex; align-items: center; justify-content: center;
 }
+/* Text wordmark — hidden by default (desktop/tablet keep the icon-only
+   mark above); shown only in the mobile top-bar rail (see media query
+   below). --color-logo (not --color-primary) — same rule as the landing
+   page navbar: this sits on a LIGHT rail background, not a dark one. */
+.rail__logo-text {
+  display: none;
+  align-items: baseline;
+  gap: 0;
+  color: var(--color-logo);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-subheading);
+}
+.rail__logo-text svg { flex-shrink: 0; }
+/* Decorative stand-in for mobile nav access — see components.js's comment;
+   not wired to open anything, this whole dashboard is a static mockup. */
+.rail__menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-base);
+  color: var(--color-text-secondary);
+  font-size: 20px;
+}
 .rail__nav { display: flex; flex-direction: column; align-items: center; padding: var(--space-4) 0 var(--space-3) 0; flex-grow: 1; }
 .rail__icon {
   width: 40px; height: 40px;
@@ -206,7 +232,12 @@
 .header-group { display: flex; align-items: center; gap: var(--space-2); }
 .search { position: relative; }
 .search i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-secondary); font-size: 18px; }
-.search input {
+/* span, not input — static mockup, must not be a real focusable/typeable
+   form control. Styled to look identical to an empty input with a
+   placeholder (same box, same muted text color for the label itself). */
+.search__field {
+  display: flex;
+  align-items: center;
   width: 220px;
   height: 34px;
   padding: 0 var(--space-2) 0 30px;
@@ -215,9 +246,8 @@
   background: var(--color-surface-1);
   font-family: inherit;
   font-size: var(--font-size-body-sm);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
 }
-.search input::placeholder { color: var(--color-text-secondary); }
 .header-icon {
   position: relative;
   width: 24px; height: 24px;
@@ -268,7 +298,11 @@
 .stat-card--warning .stat-card__icon { background: color-mix(in srgb, var(--color-score-warning) 80%, black); }
 /* Raw good was 3.30:1 — technically passing but almost no margin. */
 .stat-card--good .stat-card__icon { background: color-mix(in srgb, var(--color-score-good) 90%, black); }
-.stat-card__label { font-size: var(--font-size-caption); color: var(--color-text-secondary); }
+/* min-height reserves 2 lines' worth of space always — without it, a
+   longer label ("Medium-risk pages") wraps to 2 lines while a shorter one
+   ("Low-risk pages") stays on 1, pushing that card's value down and
+   breaking the value row's alignment across the 4 cards in the same row. */
+.stat-card__label { font-size: var(--font-size-caption); line-height: var(--line-height-body); color: var(--color-text-secondary); min-height: calc(var(--line-height-body) * var(--font-size-caption) * 2); }
 /* Always plain text-primary, not a per-category color — the icon already
    carries the category color; a big colored number on a white card read
    as garish rather than clearer. */
@@ -290,7 +324,14 @@
    instead (the table panel's existing flex-grow+margin-top:auto already
    absorbs that height gracefully — see .table-frame/.panel__footer). */
 .dashboard__cols { display: grid; grid-template-columns: 3fr 2fr; gap: var(--space-5); align-items: start; }
-.dashboard__cols .panel { display: flex; flex-direction: column; }
+/* min-width:0 — grid items default to min-width:auto, which refuses to
+   shrink a column below its content's natural (unwrapped) width. A single
+   long inline run inside either panel (e.g. the "Open the flagged file"
+   link) was enough to force the panel wider than its column, overflowing
+   past the viewport on narrow screens (looked like the panel was "cut off"
+   on the right, when it was actually pushing the whole page into
+   horizontal scroll). Same fix as .dashboard__main's own min-width:0. */
+.dashboard__cols .panel { display: flex; flex-direction: column; min-width: 0; }
 
 /* Explicit color, not inherited — this component gets reused inside the
    hero, where the ancestor sets white text for the headline. Without its
@@ -323,11 +364,26 @@
    .table-frame (clips the whole compound shape, table + footer). */
 .table-frame { display: flex; flex-direction: column; flex-grow: 1; border-radius: var(--radius-base); overflow: hidden; }
 .table-sides { border-left: 1px solid var(--table-header-tint); border-right: 1px solid var(--table-header-tint); }
+/* table-layout:fixed + explicit % widths — auto layout couldn't reliably
+   satisfy both Name and Actions wanting nowrap content at once (with two
+   competing nowrap columns, the browser's own resolution isn't something
+   we can rely on), so Actions kept losing and its icons overflowed past
+   the table's edge, clipped by .table-frame's overflow:hidden. Fixed
+   widths guarantee Actions always gets enough room for its 3 icons
+   (28px×3 + 8px×2 gap = 100px + 32px cell padding = 132px minimum);
+   Name gets the rest and truncates with ellipsis instead of overflowing
+   (see .page-name below) if its content doesn't fit. */
 table.pages {
   width: 100%;
   flex-grow: 0;
   border-collapse: collapse;
+  table-layout: fixed;
 }
+table.pages th:nth-child(1), table.pages td:nth-child(1) { width: 36%; }
+table.pages th:nth-child(2), table.pages td:nth-child(2) { width: 14%; }
+table.pages th:nth-child(3), table.pages td:nth-child(3) { width: 14%; }
+table.pages th:nth-child(4), table.pages td:nth-child(4) { width: 16%; }
+table.pages th:nth-child(5), table.pages td:nth-child(5) { width: 20%; }
 table.pages thead th {
   text-align: left;
   font-size: var(--font-size-caption);
@@ -338,21 +394,30 @@ table.pages thead th {
 }
 table.pages thead th:first-child { border-radius: var(--radius-base) 0 0 var(--radius-base); }
 table.pages thead th:last-child { border-radius: 0 var(--radius-base) var(--radius-base) 0; }
+table.pages td:last-child { white-space: nowrap; }
 table.pages td { padding: var(--space-2); border-bottom: 1px solid var(--divider-strong); font-size: var(--font-size-body-sm); vertical-align: middle; }
 table.pages tr:last-child td { border-bottom: none; }
 /* One more (faded) row instead of the table cutting off flat — signals
    "there are more pages below". */
 .pages-ghost-row { opacity: 0.4; }
-.page-name { display: flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
+.page-name { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
 .page-name i { font-size: 24px; flex-shrink: 0; color: var(--color-text-secondary); }
-.page-name .meta { display: flex; flex-direction: column; }
+.page-name .meta { display: flex; flex-direction: column; min-width: 0; }
+/* Ellipsis truncation, not nowrap-and-overflow — table.pages now uses
+   table-layout:fixed with a set % width for this column, so a filename
+   too long for that width needs to truncate cleanly instead of spilling
+   into the next column or getting clipped by .table-frame's overflow. */
+.page-name__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .page-name .word-count { font-size: var(--font-size-caption); color: var(--color-text-secondary); font-weight: var(--font-weight-regular); }
 .page-space { color: var(--color-text-secondary); white-space: nowrap; }
 .page-edited { color: var(--color-text-secondary); white-space: nowrap; }
 
 .panel__footer { display: flex; justify-content: center; margin-top: auto; padding: var(--space-3); }
-.panel__footer a { display: inline-flex; align-items: center; gap: var(--space-1); text-decoration: none; font-size: var(--font-size-body-sm); font-weight: var(--font-weight-medium); color: var(--color-primary); }
-.panel__footer a i { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+/* span, not a — the whole dashboard is a static mockup (aria-hidden in the
+   hero, role="img" in Deep-dive), so this must not be a real, clickable
+   navigation link. */
+.panel__footer span { display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--font-size-body-sm); font-weight: var(--font-weight-medium); color: var(--color-primary); }
+.panel__footer span i { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
 
 .plan-tabs { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-1); background: var(--color-surface-2); border-radius: var(--radius-base); padding: var(--space-1); margin-bottom: var(--space-3); }
 .plan-tab { text-align: center; padding: var(--space-1) 0; border-radius: var(--radius-base); font-size: var(--font-size-caption); font-weight: var(--font-weight-semibold); }
@@ -422,12 +487,30 @@ table.pages tr:last-child td { border-bottom: none; }
      colors/radius, different structure). */
   .dashboard { flex-direction: column; width: 100%; }
   .rail { width: 100%; flex-direction: row; border-right: none; border-bottom: 1px solid var(--divider-strong); }
-  .rail__top { width: auto; height: 56px; border-bottom: none; padding: 0 var(--space-3); }
+  /* space-between, not the desktop centered rule — mobile top bar now
+     shows the wordmark on the left and the decorative menu icon on the
+     right, not a single centered icon. */
+  /* width:100% — without it, .rail__top only sizes to its own content
+     (wordmark + menu icon), leaving nothing for justify-content:
+     space-between to actually distribute, so the two ended up sitting
+     next to each other near the left edge instead of at opposite ends
+     of the bar. */
+  .rail__top { width: 100%; height: 56px; border-bottom: none; padding: 0 var(--space-3); justify-content: space-between; }
   .rail__nav { display: none; }
+  /* Icon-only mark → text wordmark; add the decorative mobile menu icon. */
+  .rail__logo { display: none; }
+  .rail__logo-text { display: inline-flex; }
+  .rail__menu-btn { display: flex; }
 
-  .dashboard__header { flex-wrap: wrap; height: auto; padding: var(--space-2) var(--space-3); gap: var(--space-2); }
-  .dashboard__header-right { flex-wrap: wrap; gap: var(--space-2); }
-  .search input { width: 100%; }
+  /* nowrap, not wrap — search becomes icon-only below, so title + search
+     icon + bell + avatar now all fit on one row without needing to wrap. */
+  .dashboard__header { flex-wrap: nowrap; height: auto; padding: var(--space-2) var(--space-3); gap: var(--space-2); }
+  .dashboard__header-right { flex-wrap: nowrap; gap: var(--space-2); }
+  /* Icon-only on mobile — the full text field doesn't fit next to the
+     title without wrapping onto its own row (or crowding bell/avatar). */
+  .search__field { display: none; }
+  .search { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+  .search i { position: static; transform: none; font-size: 18px; }
 
   .dashboard__body { padding: var(--space-3); }
   .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
@@ -448,12 +531,44 @@ table.pages tr:last-child td { border-bottom: none; }
      drop to the row below — matches the "name+level one line, date+actions
      next line" mini-card pattern. */
   table.pages tr { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-2); }
-  table.pages td:nth-child(1) { order: 1; flex: 1 1 auto; min-width: 0; }
-  table.pages td:nth-child(3) { order: 2; flex-shrink: 0; }
-  table.pages td:nth-child(2) { order: 3; flex: 1 1 100%; font-size: var(--font-size-caption); }
-  table.pages td:nth-child(4) { order: 4; font-size: var(--font-size-caption); }
-  table.pages td:nth-child(5) { order: 5; margin-left: auto; }
+  /* width:auto resets on all 4 — the desktop table-layout:fixed % widths
+     above would otherwise leak in as each item's flex-basis (flex-basis:
+     auto falls back to the width property), fighting with the order/flex
+     rules below meant to control sizing here instead. */
+  table.pages td:nth-child(1) { order: 1; flex: 1 1 auto; min-width: 0; width: auto; }
+  table.pages td:nth-child(3) { order: 2; flex-shrink: 0; width: auto; }
+  /* No flex:100% here (unlike nth-child(5) below) — name's own flex:1 1 auto
+     already consumes all of line 1's leftover width, so teamspace is
+     already forced onto its own line without needing to claim 100% of it;
+     leaving it auto-sized lets the edited-date cell join it on that same
+     line instead of being pushed to a third line of its own. */
+  table.pages td:nth-child(2) { order: 3; font-size: var(--font-size-caption); width: auto; }
+  table.pages td:nth-child(4) { order: 4; font-size: var(--font-size-caption); width: auto; }
+  /* Own full-width line, not margin-left:auto sharing the teamspace/date
+     line — squeezing all three (teamspace text + date + 3 action icons)
+     onto one line was overflowing past the card's right edge on narrow
+     phones, and .table-frame's overflow:hidden silently clipped it instead
+     of wrapping. */
+  table.pages td:nth-child(5) { order: 5; flex: 1 1 100%; }
+  table.pages td:nth-child(5) .actions-row { justify-content: flex-end; }
   .page-name { white-space: normal; }
+  .page-name__title { white-space: normal; overflow: visible; text-overflow: clip; }
+  /* Side borders framed the table for the desktop boxed-table look — on
+     mobile the table is a stack of row-cards instead, and the vertical
+     lines had nothing to visually "frame" any more. Row dividers
+     (table.pages tr's own border-bottom) stay untouched. */
+  .table-sides { border-left: none; border-right: none; }
+
+  /* Row 1: title + count on opposite ends of one line. Row 2: subtitle.
+     Row 3: toolbar buttons, right-aligned. flex-direction:column turns
+     .panel__head's 2 children (the title+subtitle group, and .toolbar)
+     into rows 1+2 and row 3; align-items:stretch (overriding desktop's
+     flex-end) makes both spans the full width so h3's own
+     justify-content:space-between below has room to push the count badge
+     all the way to the right edge. */
+  .panel__head { flex-direction: column; align-items: stretch; gap: var(--space-2); }
+  .panel__head h3 { justify-content: space-between; }
+  .toolbar { justify-content: flex-start; }
 
   .dashboard__cols { gap: var(--space-3); }
   .panel { padding: var(--space-3); }

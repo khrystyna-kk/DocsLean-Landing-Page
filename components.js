@@ -63,7 +63,7 @@ function priorityPanelHTML() {
         <div class="task-detail__field--solution">
           <div class="field-label field-label--accent"><i class="ph ph-lightbulb-filament" aria-hidden="true"></i>Solution:</div>
           <ol class="task-detail__solution">
-            <li><a href="#" class="task-detail__solution-link">Open the flagged file<i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></li>
+            <li><span class="task-detail__solution-link">Open the flagged file<i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></li>
             <li>Fix each highlighted issue — specific recommendations are included for every one.</li>
             <li>Notify your team once it's updated, so everyone works from the latest version.</li>
           </ol>
@@ -109,7 +109,7 @@ function pagesTableRowsHTML() {
   ];
   const rowHTML = ([name, words, space, level, levelLabel, edited]) => `
     <tr>
-      <td><span class="page-name"><i class="ph ph-file" aria-hidden="true"></i><span class="meta">${name}<span class="word-count">${words}</span></span></span></td>
+      <td><span class="page-name"><i class="ph ph-file" aria-hidden="true"></i><span class="meta"><span class="page-name__title">${name}</span><span class="word-count">${words}</span></span></span></td>
       <td class="page-space">${space}</td>
       <td><span class="badge badge--${level}">${levelLabel}</span></td>
       <td class="page-edited">${edited}</td>
@@ -118,7 +118,7 @@ function pagesTableRowsHTML() {
   `;
   const ghostRow = `
     <tr class="pages-ghost-row">
-      <td><span class="page-name"><i class="ph ph-file" aria-hidden="true"></i><span class="meta">Employee onboarding guide<span class="word-count">1,120 words</span></span></span></td>
+      <td><span class="page-name"><i class="ph ph-file" aria-hidden="true"></i><span class="meta"><span class="page-name__title">Employee onboarding guide</span><span class="word-count">1,120 words</span></span></span></td>
       <td class="page-space">Engineering</td>
       <td><span class="badge badge--good">Low</span></td>
       <td class="page-edited">Jun 6, 2026</td>
@@ -136,6 +136,18 @@ function dashboardHTML() {
           <div class="rail__logo" aria-hidden="true">
             <svg viewBox="0 0 13 15" width="14" height="16"><path d="${LOGO_MARK_PATH_D}" fill="currentColor"/></svg>
           </div>
+          <!-- Text wordmark shown only on mobile (rail collapses to a
+               horizontal top bar there) — the icon-only mark alone reads
+               ambiguous once it's no longer next to the vertical icon rail
+               giving it "app nav" context, same reasoning as the landing
+               page's own navbar using the full wordmark. -->
+          <div class="rail__logo-text" aria-hidden="true">
+            <svg viewBox="0 0 13 15" width="13" height="15"><path d="${LOGO_MARK_PATH_D}" fill="currentColor"/></svg><span>ocsLean</span>
+          </div>
+          <!-- Decorative only — the whole dashboard is a static mockup, so
+               this doesn't open a real sidebar. It represents where mobile
+               nav access would live in the real product. -->
+          <span class="rail__menu-btn" aria-hidden="true"><i class="ph ph-list" aria-hidden="true"></i></span>
         </div>
         <div class="rail__nav">
           <span class="rail__icon rail__icon--active" title="Dashboard" aria-label="Dashboard"><i class="ph ph-squares-four" aria-hidden="true"></i></span>
@@ -152,10 +164,10 @@ function dashboardHTML() {
         <div class="dashboard__header">
           <h1 class="page-title">Dashboard</h1>
           <div class="dashboard__header-right">
-            <label class="search">
+            <div class="search">
               <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-              <input type="text" placeholder="Search pages...">
-            </label>
+              <span class="search__field">Search pages...</span>
+            </div>
             <div class="header-group">
               <span class="header-icon"><i class="ph ph-bell" aria-hidden="true"></i><span class="dot"></span></span>
               <div class="avatar">OM</div>
@@ -213,7 +225,7 @@ function dashboardHTML() {
                     </tbody>
                   </table>
                 </div>
-                <div class="panel__footer"><a href="#">View all 184 pages<i class="ph ph-arrow-right" aria-hidden="true"></i></a></div>
+                <div class="panel__footer"><span>View all 184 pages<i class="ph ph-arrow-right" aria-hidden="true"></i></span></div>
               </div>
             </div>
 
